@@ -12,9 +12,13 @@ import { buildContext } from "graphql-passport";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { rateLimit } from 'express-rate-limit'
 import helmet from "helmet";
+import ConnectMongoDBSession from "connect-mongodb-session";
 
 import dotenv from "dotenv";
 dotenv.config();
+
+import { configurePassport } from "./config/passport.config.js";
+await configurePassport();
 
 const app = express();
 
@@ -37,17 +41,33 @@ const limiter = rateLimit({
     legacyHeaders: false,
 });
 
+// Session store setup 👇
+const MongoDBStore = ConnectMongoDBSession(session);
+// ✔ small library to saves your user sessions in a MongoDB collection instead of just keeping them in memory.
+// ✔ By default, express-session stores all sessions in server memory (RAM). 
+// ✔ But it has big problems in production like all users get logged out immediately when server restart. Memory fills up when many users are online.
+// ✔ should use connect-mongodb-session if: You’re using express-session or deploy on AWS Lambda + MongoDB Atlas, Render, Railway, Vercel (API) etc.
+
+const store = new MongoDBStore({
+    uri: process.env.MONGO_URI,
+    collection: "sessions",
+});
+
+store.on("error", (error) => {
+    console.log("❌ Session store error:", error);
+});
 // 🔐 Session middleware (Passport needs it)
 app.use(
     session({
         secret: process.env.SESSION_SECRET || "keyboard cat",
-        resave: false,
+        resave: false, // if true, then we have multiple sessions of same user in db
         saveUninitialized: false,
+        store: store, // ✅ store sessions in MongoDB
         cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 7,
             httpOnly: true,        // JS can’t read cookies → prevents XSS
             secure: process.env.NODE_ENV === "production", // HTTPS only in production
-            sameSite: "lax",       // helps prevent CSRF
-            maxAge: 1000 * 60 * 60 * 2, // 2 hours
+            sameSite: "lax",       // helps prevent CSRF 
         },
     })
 );
@@ -58,10 +78,10 @@ app.use(passport.session());
 // ⚠️ Apply security middlewares
 app.use(limiter);
 app.use(helmet({
-  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
-  crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+    crossOriginEmbedderPolicy: false,
 }));
-app.set('trust proxy', 1); 
+app.set('trust proxy', 1);
 // If your app is hosted behind another server (like Nginx or Render), this makes Express correctly detect real user IPs and HTTPS connections.
 // Without it, things like: 
 // req.ip, secure cookies, HTTPS checks > might not work correctly.
