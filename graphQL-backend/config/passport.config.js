@@ -18,11 +18,11 @@ export const configurePassport = async () => {
         }
     });
 
-    passport.use(new GraphQLLocalStrategy(async (email, password, done) => {
+    passport.use(new GraphQLLocalStrategy(async (username, password, done) => {
         try {
-            const user = await User.findOne({ email });
+            const user = await User.findOne({ username });
             if (!user) {
-                return done(null, false, { message: 'Incorrect email.' });
+                return done(null, false, { message: 'Incorrect username.' });
             }
 
             const isMatch = await bcrypt.compare(password, user.password);
