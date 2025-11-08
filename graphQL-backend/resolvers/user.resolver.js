@@ -7,7 +7,12 @@ const userResolver = {
         // 1. fetch authenticated user details
         authUser: async (_, __, context) => {
             try {
-                const user = await context.getUser(); // ✅ correct GraphQL Passport method
+                const user = await context.getUser();
+
+                // console.log("req.session:", context.req.session);
+                // console.log("req.user:", context.req.user);
+                // console.log(`authUser is: ${user}`);
+
                 return user;
             } catch (error) {
                 console.log(`Internal server error: authUser Failed:: ${error}`);

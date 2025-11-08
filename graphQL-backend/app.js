@@ -49,13 +49,18 @@ const MongoDBStore = ConnectMongoDBSession(session);
 // ✔ should use connect-mongodb-session if: You’re using express-session or deploy on AWS Lambda + MongoDB Atlas, Render, Railway, Vercel (API) etc.
 
 const store = new MongoDBStore({
-    uri: process.env.MONGO_URI,
+    uri: `${process.env.MONGO_URI}`,
     collection: "sessions",
+});
+
+store.on("connected", () => {
+    console.log("✔ Session store connected to MongoDB");
 });
 
 store.on("error", (error) => {
     console.log("❌ Session store error:", error);
 });
+
 // 🔐 Session middleware (Passport needs it)
 app.use(
     session({
@@ -87,7 +92,7 @@ app.set('trust proxy', 1);
 // req.ip, secure cookies, HTTPS checks > might not work correctly.
 
 // CORS and body-parser
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: [process.env.FRONTEND_URL, "http://localhost:5173"], credentials: true, }));
 app.use(bodyParser.json());
 
 // GraphQL setup

@@ -1,8 +1,11 @@
 
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import InputField from "../components/InputField";
+import { LOGIN_USER } from "../graphQL/mutations/user.mutaion";
+import { useMutation } from "@apollo/client/react";
+import { toast } from "react-toastify";
 
 const Login = () => {
 	const [loginData, setLoginData] = useState({
@@ -18,9 +21,25 @@ const Login = () => {
 		}));
 	};
 
-	const handleSubmit = (e) => {
+	const [login, { loading }] = useMutation(LOGIN_USER, { refetchQueries: ["GetAuthenticatedUser"] });
+	const navigate = useNavigate();
+
+	const handleSubmit = async(e) => {
 		e.preventDefault();
-		console.log(loginData);
+		try {
+			await login({
+				variables: {
+					loginInput: loginData,
+				},
+			}).then((response) => {
+				console.log("Login successful:", response.data.login);
+				toast.success("Login successful!");
+				navigate("/");
+			});
+		} catch (error) {
+			console.error("Error logging in:", error);
+			toast.error(`Error logging in: ${error.message}`);
+		}
 	};
 
 	return (
@@ -52,11 +71,11 @@ const Login = () => {
 							<div>
 								<button
 									type='submit'
-									className='w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black  focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300
-										disabled:opacity-50 disabled:cursor-not-allowed
+									className='w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black  focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed
 									'
+									disabled={loading}
 								>
-									Login
+									{loading ? "Loading..." : "Login"}
 								</button>
 							</div>
 						</form>
