@@ -134,6 +134,8 @@ app.listen(4000, () => {
     connectDB();
 });
 
+export default app; // for deployment on serverless platforms like Vercel, Netlify, etc.
+
 
 
 
