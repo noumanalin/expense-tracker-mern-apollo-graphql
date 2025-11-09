@@ -22,7 +22,7 @@
     "body-parser": "^2.2.0",
     "compression": "^1.8.1",
     "connect-mongodb-session": "^5.0.0",
-    "cron": "^4.3.3",
+    "cron": "^4.3.4",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
