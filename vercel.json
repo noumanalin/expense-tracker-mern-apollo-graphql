@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "builds": [
+    {
+      "src": "graphQL-backend/app.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "react-frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/graphql",
+      "dest": "/graphQL-backend/app.js",
+      "methods": ["GET", "POST", "OPTIONS"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/react-frontend/dist/$1"
+    }
+  ]
+}
