@@ -10,14 +10,39 @@ import { GET_AUTHENTICATED_USER } from "../graphQL/queries/user.query";
 import { GET_TRANSACTION_STATISTICS } from "../graphQL/queries/transaction.query";
 import { useEffect, useState } from "react";
 import { LOGOUT_USER } from "../graphQL/mutations/user.mutaion";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const categoryColors = {
+	salary: "#1E90FF",
+	saving: "#3CB371",
+	investment: "#4682B4",
+	"business income": "#4169E1",
+	bonus: "#00CED1",
+	expense: "#FF6347",
+	shopping: "#FF69B4",
+	food: "#FFD700",
+	entertainment: "#FF4500",
+	bills: "#FFA500",
+	utilities: "#20B2AA",
+	transport: "#00BFFF",
+	fuel: "#A0522D",
+	travel: "#9370DB",
+	rent: "#CD5C5C",
+	installments: "#D2691E",
+	"loan payment": "#8B0000",
+	education: "#6495ED",
+	health: "#9ACD32",
+	insurance: "#6A5ACD",
+	gift: "#DA70D6",
+	charity: "#32CD32",
+	tax: "#FF8C00",
+	other: "#808080",
+};
+
 const Home = () => {
-	const { data: userData } = useQuery(GET_AUTHENTICATED_USER)
-
-
+	const { data: userData } = useQuery(GET_AUTHENTICATED_USER);
 
 	// const chartData = {
 	// 	labels: ["Saving", "Expense", "Investment"],
@@ -34,9 +59,9 @@ const Home = () => {
 	// 		},
 	// 	],
 	// };
- 
+
 	const client = useApolloClient();
-	const [logout, { loading: isLoggingOut }] = useMutation(LOGOUT_USER)
+	const [logout, { loading: isLoggingOut }] = useMutation(LOGOUT_USER);
 
 	const handleLogout = async () => {
 		try {
@@ -50,7 +75,6 @@ const Home = () => {
 		} catch (error) {
 			toast.error(`Error logging out ${error.message}`);
 		}
-
 	};
 
 	const { data } = useQuery(GET_TRANSACTION_STATISTICS);
@@ -75,21 +99,8 @@ const Home = () => {
 			const categories = data.categoryStatistics.map((stat) => stat.category);
 			const totalAmounts = data.categoryStatistics.map((stat) => stat.totalAmount);
 
-			const backgroundColors = [];
-			const borderColors = [];
-
-			categories.forEach((category) => {
-				if (category === "saving") {
-					backgroundColors.push("rgba(75, 192, 192)");
-					borderColors.push("rgba(75, 192, 192)");
-				} else if (category === "expense") {
-					backgroundColors.push("rgba(255, 99, 132)");
-					borderColors.push("rgba(255, 99, 132)");
-				} else if (category === "investment") {
-					backgroundColors.push("rgba(54, 162, 235)");
-					borderColors.push("rgba(54, 162, 235)");
-				}
-			});
+			const backgroundColors = categories.map((cat) => categoryColors[cat] || "#808080");
+			const borderColors = backgroundColors.map((color) => color);
 
 			setChartData((prev) => ({
 				labels: categories,
@@ -123,7 +134,7 @@ const Home = () => {
 					{isLoggingOut && <div className='w-6 h-6 border-t-2 border-b-2 mx-2 rounded-full animate-spin'></div>}
 				</div>
 				<div className='flex flex-wrap w-full justify-center items-center gap-6'>
-					<div className='h-[330px] w-[330px] md:h-[360px] md:w-[360px]  '>
+					<div className='h-[330px] w-[330px] md:h-[360px] md:w-[360px]'>
 						<Doughnut data={chartData} />
 					</div>
 
@@ -135,4 +146,4 @@ const Home = () => {
 	);
 };
 
-export default Home
+export default Home;

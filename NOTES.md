@@ -12,7 +12,30 @@
 -   Overall, @apollo/server simplifies the process of creating and maintaining GraphQL servers in Node.js environments.
 
 
+# render.com -> deploy FE and BE both with same domain (package.json scripts reference)
+- This (NODE_ENV=production) syntax works on Linux/macOS, but not on Windows.
+```
+  "scripts": {
+    "start": "NODE_ENV=production node graphQL-backend/index.js",
+		"dev": "NODE_ENV=development nodemon graphQL-backend/index.js", 
+    "build": "npm install && npm run build --prefix react-frontend && npm run build --prefix react-frontend"
+  },
+```
+- This will work on Windows, Linux, or macOS.
+```
+"scripts": {
+  "dev": "cross-env NODE_ENV=development nodemon graphQL-backend/app.js",
+  "start": "cross-env NODE_ENV=production node graphQL-backend/app.js",
+  "build": "npm install && npm run build --prefix react-frontend && npm run build --prefix react-frontend"
+}
+```
 
+## NODE_ENV=production
+Sets an environment variable NODE_ENV to "production".
+Many libraries (like Express, Apollo Server, React, etc.) use this to optimize behavior:
+- Disable debugging logs
+- Enable caching
+- Disable hot reload / playgrounds
 
 ### 👉 The following operations could be performed on the data via a single end point:
 - `Queries` are used to request data (analogous to GET request in REST)

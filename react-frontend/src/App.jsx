@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
@@ -10,9 +10,15 @@ import { BackgroundBeams } from './components/BackgroundBeams'
 import { ToastContainer } from 'react-toastify';
 import { useQuery } from '@apollo/client/react'
 import { GET_AUTHENTICATED_USER } from './graphQL/queries/user.query'
+import { useEffect } from 'react'
 
 const App = () => {
-  const { data, loading, error } = useQuery(GET_AUTHENTICATED_USER)
+  const { data, loading } = useQuery(GET_AUTHENTICATED_USER)
+
+    const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   if (loading) {
     return <section>

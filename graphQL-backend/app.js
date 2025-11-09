@@ -3,6 +3,7 @@ import { ApolloServer } from "@apollo/server";
 // And In Apollo Server v5, they completely removed the express4 integration from the main package.
 import { expressMiddleware } from '@as-integrations/express5';
 import express from "express";
+import path from "path";
 import http from "http";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -21,6 +22,7 @@ import { configurePassport } from "./config/passport.config.js";
 await configurePassport();
 
 const app = express();
+const __dirname = path.resolve();
 
 import compression from "compression";
 app.use(compression()); // Shrinks response size for faster delivery
@@ -117,6 +119,15 @@ app.use('/graphql', expressMiddleware(server, {
     context: async ({ req, res }) => buildContext({ req, res }), // ✅ important line
     introspection: process.env.NODE_ENV !== 'production',
 }));
+
+
+// npm run build will build your frontend app, and it will the optimized version of your app
+app.use(express.static(path.join(__dirname, "react-frontend/dist")));
+// Serve React frontend for any other route (not /graphql)
+app.use((req, res, next) => {
+  if (req.path.startsWith("/graphql")) return next(); // skip GraphQL requests
+  res.sendFile(path.join(__dirname, "react-frontend/dist/index.html"));
+});
 
 app.listen(4000, () => {
     console.log("🚀 Server ready at http://localhost:4000/graphql");
