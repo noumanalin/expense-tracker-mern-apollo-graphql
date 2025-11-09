@@ -125,14 +125,26 @@ app.use('/graphql', expressMiddleware(server, {
 app.use(express.static(path.join(__dirname, "react-frontend/dist")));
 // Serve React frontend for any other route (not /graphql)
 app.use((req, res, next) => {
-  if (req.path.startsWith("/graphql")) return next(); // skip GraphQL requests
-  res.sendFile(path.join(__dirname, "react-frontend/dist/index.html"));
+    if (req.path.startsWith("/graphql")) return next(); // skip GraphQL requests
+    res.sendFile(path.join(__dirname, "react-frontend/dist/index.html"));
 });
 
-app.listen(4000, () => {
-    console.log("🚀 Server ready at http://localhost:4000/graphql");
-    connectDB();
-});
+
+
+if (process.env.NODE_ENV === "production") {
+    const startServer = async () => {
+        await connectDB();
+        console.log("Database connected");
+    };
+
+    startServer().catch(console.error);
+} else {
+
+    app.listen(4000, () => {
+        console.log("🚀 Server ready at http://localhost:4000/graphql");
+        connectDB();
+    });
+}
 
 export default app; // for deployment on serverless platforms like Vercel, Netlify, etc.
 
