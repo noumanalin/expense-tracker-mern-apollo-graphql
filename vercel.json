@@ -6,22 +6,18 @@
       "use": "@vercel/node"
     },
     {
-      "src": "react-frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "react-frontend/dist/**/*",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/graphql",
-      "dest": "/graphQL-backend/app.js",
-      "methods": ["GET", "POST", "OPTIONS"]
+      "dest": "graphQL-backend/app.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/react-frontend/dist/$1"
+      "dest": "graphQL-backend/app.js"
     }
   ]
 }
