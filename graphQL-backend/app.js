@@ -146,6 +146,9 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
+// Neded to connectDB because at production mongodb is not connected when using serverless platforms.
+await connectDB();
+
 export default app; // for deployment on serverless platforms like Vercel, Netlify, etc.
 
 
