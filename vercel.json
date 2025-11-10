@@ -4,10 +4,6 @@
     {
       "src": "graphQL-backend/app.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "react-frontend/dist/**/*",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
