@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "nodemon graphQL-backend/app.js",
     "start": "node graphQL-backend/app.js",
-    "build": "npm install && npm install --prefix react-frontend && npm run build --prefix react-frontend",
-    "vercel-build": "cd react-frontend && npm install && npm run build"
+    "build": "npm install --prefix react-frontend && npm run build --prefix react-frontend",
+    "vercel-build": "npm install --prefix react-frontend && npm run build --prefix react-frontend"
   },
   "keywords": [
     "graphQL-best-practices"
